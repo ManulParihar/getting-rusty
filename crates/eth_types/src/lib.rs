@@ -9,7 +9,7 @@ pub enum AddressError {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Address(pub [u8; 20]);
+pub struct Address([u8; 20]);
 
 impl Address {
     pub const ZERO: Self = Self([0u8; 20]);

@@ -21,7 +21,7 @@ mod tests {
         let addr = [1u8; 20];
         assert_eq!(
             Address::from_slice(&addr).unwrap(),
-            Address(addr)
+            Address::from(addr)
         );
     }
 
@@ -41,7 +41,7 @@ mod tests {
         let addr = Address::from_str(str).unwrap();
         assert_eq!(
             addr,
-            Address([0xab; 20])
+            Address::from([0xab; 20])
         );
     }
 
@@ -51,14 +51,17 @@ mod tests {
         let addr = Address::from_str(str).unwrap();
         assert_eq!(
             addr,
-            Address([0xab; 20])
+            Address::from([0xab; 20])
         );
     }
 
     #[test]
     fn from_str_invalid_length() {
         let str = "0xabcabc";
-        Address::from_str(str).expect_err("Invalid length: expected 20 bytes");
+        assert_eq!(
+            Address::from_str(str).unwrap_err(),
+            AddressError::InvalidLength
+        )
     }
 
     #[test]
@@ -73,7 +76,7 @@ mod tests {
     // Display/Debug
     #[test]
     fn display_is_hex () {
-        let addr = Address([0xab; 20]);
+        let addr = Address::from([0xab; 20]);
         assert_eq!(
             addr.to_string(),
             "abababababababababababababababababababab"
@@ -93,14 +96,14 @@ mod tests {
     // roundtrip
     #[test]
     fn display_parse_roundtrip() {
-        let original = Address([9u8; 20]);
+        let original = Address::from([9u8; 20]);
         let parsed = Address::from_str(&original.to_string()).unwrap();
         assert_eq!(parsed, original);
     }
 
     #[test]
     fn display_parse_roundtrip_with_prefix() {
-        let original = Address([7u8; 20]);
+        let original = Address::from([7u8; 20]);
         let s = format!("0x{}", original);
         let parsed = Address::from_str(&s).unwrap();
         assert_eq!(parsed, original);
