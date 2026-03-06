@@ -9,7 +9,6 @@ pub enum H256Error {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-
 pub struct H256([u8; 32]);
 
 impl H256 {
