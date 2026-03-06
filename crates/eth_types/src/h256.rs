@@ -1,8 +1,8 @@
 use std::{fmt::Debug, str::FromStr};
 
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
-pub enum HashError {
-    #[error("Invlaid length: expected 20 bytes")]
+pub enum H256Error {
+    #[error("Invlaid length: expected 32 bytes")]
     InvalidLength,
     #[error("Invalid hex")]
     InvalidHex,
@@ -13,7 +13,7 @@ pub enum HashError {
 pub struct H256([u8; 32]);
 
 impl H256 {
-    const ZERO:Self = Self([0u8; 32]);
+    pub const ZERO:Self = Self([0u8; 32]);
 
     pub fn zero() -> Self {
         Self::ZERO
@@ -23,15 +23,13 @@ impl H256 {
         &self.0
     }
 
-    pub fn from_slice(slice: &[u8]) -> Result<Self, HashError> {
+    pub fn from_slice(slice: &[u8]) -> Result<Self, H256Error> {
         if slice.len() != 32 {
-            return Err(HashError::InvalidLength);
+            return Err(H256Error::InvalidLength);
         }
-        else {
-            let mut bytes_slice = [0u8; 32];
-            bytes_slice.copy_from_slice(slice);
-            Ok(Self(bytes_slice))
-        }
+        let mut bytes_slice = [0u8; 32];
+        bytes_slice.copy_from_slice(slice);
+        Ok(Self(bytes_slice))
     }
 }
 
@@ -55,16 +53,16 @@ impl std::fmt::Display for H256 {
 
 impl Debug for H256 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Hash({self})")
+        write!(f, "H256({self})")
     }
 }
 
 impl FromStr for H256 {
-    type Err = HashError;
+    type Err = H256Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let s = s.strip_prefix("0x").unwrap_or(s);
-        let value = hex::decode(s).map_err(|_| HashError::InvalidHex)?;
+        let value = hex::decode(s).map_err(|_| H256Error::InvalidHex)?;
         H256::from_slice(&value)
     }
 }
