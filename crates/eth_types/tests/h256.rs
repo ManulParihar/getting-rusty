@@ -11,7 +11,7 @@ mod tests {
     }
 
     #[test]
-    fn zero_const_zero_address() {
+    fn zero_const_matches_zero_fn() {
         assert_eq!(H256::ZERO, H256::zero());
     }
 
@@ -44,7 +44,7 @@ mod tests {
 
     // FromStr
     #[test]
-    fn from_str_with_prefex() {
+    fn from_str_with_prefix() {
         let str = "0xabababababababababababababababababababababababababababababababab";
         assert_eq!(
             H256::from_str(str).unwrap(),
@@ -53,7 +53,7 @@ mod tests {
     }
 
     #[test]
-    fn from_str_without_prefex() {
+    fn from_str_without_prefix() {
         let str = "abababababababababababababababababababababababababababababababab";
         assert_eq!(
             H256::from_str(str).unwrap(),
