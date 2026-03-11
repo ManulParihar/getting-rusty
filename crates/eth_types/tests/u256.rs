@@ -20,14 +20,15 @@ mod tests {
         let num = U256::from(42u64);
         let limbs = num.as_limbs();
         
-        assert_eq!((*limbs)[0], 42);
-        assert_eq!((*limbs)[1], 0);
-        assert_eq!((*limbs)[2], 0);
-        assert_eq!((*limbs)[3], 0);
+        // (*limbs)[0] <=> limbs[0] because of auto deref
+        assert_eq!(limbs[0], 42);
+        assert_eq!(limbs[1], 0);
+        assert_eq!(limbs[2], 0);
+        assert_eq!(limbs[3], 0);
     }
 
     #[test]
-    fn is_equal() {
+    fn display_hex() {
         assert_eq!(
             U256::from(42u64).to_string(),
             "2a"
@@ -37,17 +38,16 @@ mod tests {
     #[test]
     fn display_formatting() {
         let num = U256::from(42u64);
-        let format = format!("{num}");
         assert_eq!(
-            format,
-            num.to_string()
+            num.to_string(),
+            "2a"
         );
     }
 
     #[test]
     fn debug_formatting() {
         let num = U256::from(42u64);
-        let format = format!("U256({num})");
+        let format = format!("U256(0x{num})");
         assert_eq!(
             format!("{:?}", num),
             format
@@ -61,5 +61,16 @@ mod tests {
 
         assert_eq!(zero.is_zero(), true);
         assert_eq!(non_zero.is_zero(), false);
+    }
+
+    #[test]
+    fn display_multi_limb() {
+        // 2^64
+        let num = U256::from_limbs([0, 1, 0, 0]);
+        assert_eq!(
+            num.to_string(),
+            // 4 bits per hex digit => 16 bits for 2^64 => 16 zeros
+            "10000000000000000"
+        );
     }
 }

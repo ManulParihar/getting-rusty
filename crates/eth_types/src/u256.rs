@@ -3,6 +3,18 @@ use std::fmt::{Debug, Display};
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct U256([u64; 4]);
 
+/**
+ * U256([l0, l1, l2, l3])
+ * ============================================================
+ * (l0 * 2^0) + (l1 * 2^64) + (l2 * 2^128) + (l3 * 2^192)
+ *      ^                                       ^
+ *      |                                       |
+ * lest significant                         most significant
+ * ============================================================
+ * |  limb3  |  limb2  |  limb1 | limb0 |
+ * | 192 bit | 128 bit | 64 bit | 0 bit |
+ * ============================================================
+ */
 impl U256 {
     pub const ZERO:Self = Self([0u64; 4]);
 
@@ -12,6 +24,11 @@ impl U256 {
 
     pub fn as_limbs(&self) -> &[u64; 4] {
         &self.0
+    }
+
+    // Helper to construct U256 for multi limbs (num >= 2^64)
+    pub fn from_limbs(limbs: [u64; 4]) -> Self {
+        Self(limbs)
     }
 
     pub fn is_zero(&self) -> bool {
@@ -50,6 +67,6 @@ impl Display for U256 {
 
 impl Debug for U256 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "U256({})", self)
+        write!(f, "U256(0x{})", self)
     }
 }
