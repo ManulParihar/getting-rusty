@@ -106,11 +106,22 @@ mod tests {
     #[test]
     fn overflow_wrapping() {
         let sum = U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, u64::MAX]) + 
-                        U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, u64::MAX]);
+                        U256::from_limbs([1, 0, 0, 0]);
 
         assert_eq!(
             sum,
             U256::ZERO
+        );
+    }
+
+    #[test]
+    fn add_assign() {
+        let mut num = U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, 0u64]);
+        num += U256::from(1u64);
+
+        assert_eq!(
+            num,
+            U256::from_limbs([0, 0, 0, 1])
         );
     }
 }

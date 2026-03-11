@@ -1,6 +1,6 @@
 use std::{
     fmt::{Debug, Display},
-    ops::Add
+    ops::{Add, AddAssign}
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -81,23 +81,30 @@ impl Add for U256 {
         
         let mut num = [0u64; 4];
 
-        let (sum, carry) = u64::overflowing_add(self.0[0], rhs.0[0]);
+        let (sum, carry) = self.0[0].overflowing_add(rhs.0[0]);
         num[0] = sum;
         let mut set_carry = carry;
 
         for i in 1..4 {
-            let (sum, carry) = u64::overflowing_add(self.0[i], rhs.0[i]);
+            let (sum, carry1) = self.0[i].overflowing_add(rhs.0[i]);
+            num[i] = sum;
+            
             if set_carry {
-                num[i] = 1u64;
+                let (sum, carry2) = num[i].overflowing_add(1u64);
+                num[i] = sum;
+                set_carry = carry1 || carry2;
             }
-            num[i] += sum;
-            set_carry = carry;
-        }
-
-        if set_carry {
-            num = [0u64; 4];
+            else {
+                set_carry = carry1;
+            }
         }
         
         Self(num)
+    }
+}
+
+impl AddAssign for U256 {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
     }
 }
