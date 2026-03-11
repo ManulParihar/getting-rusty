@@ -1,4 +1,7 @@
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    ops::Add
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct U256([u64; 4]);
@@ -68,5 +71,33 @@ impl Display for U256 {
 impl Debug for U256 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "U256(0x{})", self)
+    }
+}
+
+impl Add for U256 {
+    type Output = U256;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        
+        let mut num = [0u64; 4];
+
+        let (sum, carry) = u64::overflowing_add(self.0[0], rhs.0[0]);
+        num[0] = sum;
+        let mut set_carry = carry;
+
+        for i in 1..4 {
+            let (sum, carry) = u64::overflowing_add(self.0[i], rhs.0[i]);
+            if set_carry {
+                num[i] = 1u64;
+            }
+            num[i] += sum;
+            set_carry = carry;
+        }
+
+        if set_carry {
+            num = [0u64; 4];
+        }
+        
+        Self(num)
     }
 }

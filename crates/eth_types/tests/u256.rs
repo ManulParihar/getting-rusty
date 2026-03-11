@@ -73,4 +73,44 @@ mod tests {
             "10000000000000000"
         );
     }
+
+    #[test]
+    fn basic_addition() {
+        let sum = U256::from(1u64) + U256::from(10u64);
+        assert_eq!(
+            sum,
+            U256::from(11u64)
+        );
+    }
+
+    #[test]
+    fn single_limb_overflow() {
+        let sum = U256::from_limbs([u64::MAX, 0, 0, 0]) + U256::from(1u64);
+        assert_eq!(
+            sum,
+            U256::from_limbs([0, 1, 0, 0])
+        );
+    }
+
+    #[test]
+    fn multi_limb_overflow() {
+        let sum = U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, 1u64]) + 
+                        U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, 10u64]);
+
+        assert_eq!(
+            sum,
+            U256::from_limbs([(u64::MAX - 1u64), u64::MAX, u64::MAX, 12u64])
+        );
+    }
+
+    #[test]
+    fn overflow_wrapping() {
+        let sum = U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, u64::MAX]) + 
+                        U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, u64::MAX]);
+
+        assert_eq!(
+            sum,
+            U256::ZERO
+        );
+    }
 }
