@@ -124,4 +124,56 @@ mod tests {
             U256::from_limbs([0, 0, 0, 1])
         );
     }
+
+    #[test]
+    fn basic_shl() {
+        // ...0001 << 1 === ...0010
+        let num = U256::from(1u64);
+        assert_eq!(
+            num << 1,
+            U256::from(2u64)
+        );
+    }
+
+    #[test]
+    fn boundary_shift_shl() {
+        // (binary) 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0001 << 63
+        // (binary) 1000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+        // (hex)    8    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+        let num = U256::from(1u64);
+        assert_eq!(
+            num << 63,
+            U256::from_limbs([0x8000000000000000, 0, 0, 0])
+        );
+    }
+
+    #[test]
+    fn limb_shift_shl() {
+        // U256([1, 0, 0, 0]) << 64 === U256([0, 1, 0, 0])
+        let num = U256::from(1u64);
+        assert_eq!(
+            num << 64,
+            U256::from_limbs([0, 1, 0, 0])
+        );
+    }
+
+    #[test]
+    fn multi_limb_shift_shl() {
+        // U256([1, 0, 0, 0]) << 128 === U256([0, 0, 1, 0])
+        let num = U256::from(1u64);
+        assert_eq!(
+            num << 128,
+            U256::from_limbs([0, 0, 1, 0])
+        );
+    }
+
+    #[test]
+    fn overflow_limb_shift_shl() {
+        // U256([1, 0, 0, 0]) << 256 === U256([0, 0, 0, 0])
+        let num = U256::from(1u64);
+        assert_eq!(
+            num << 256,
+            U256::ZERO
+        );
+    }
 }
