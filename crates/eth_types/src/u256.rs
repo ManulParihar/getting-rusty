@@ -1,6 +1,6 @@
 use std::{
     fmt::{Debug, Display},
-    ops::{Add, AddAssign, Shl}
+    ops::{Add, AddAssign, Shl, Shr}
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -42,6 +42,12 @@ impl U256 {
 impl From<u64> for U256 {
     fn from(value: u64) -> Self {
         Self([value, 0, 0, 0])
+    }
+}
+
+impl From<[u64; 4]> for U256 {
+    fn from(value: [u64; 4]) -> Self {
+        Self(value)
     }
 }
 
@@ -145,7 +151,49 @@ impl Shl<u32> for U256 {
                     // `|=` overwrites the left most bits with the carry over from previous bits
                     // since shl will discard carry over bits, it can be calculated
                     // by reverse shifting (i.e. shifting right) by (64-bit_shift) units
-                    num[i] |= limbs[i] >> (64 - bit_shift);
+                    num[i] |= limbs[i - 1] >> (64 - bit_shift);
+                }
+            }
+        }
+
+        U256(num)
+    }
+}
+
+// Implementing >> (bit shift right) for U256
+impl Shr<u32> for U256 {
+    type Output = U256;
+
+    fn shr(self, rhs: u32) -> Self::Output {
+        // handle overflow
+        if rhs >= 256 {
+            return Self::ZERO;
+        }
+
+        let mut num = [0u64; 4];
+        let limbs = self.0;
+
+        // limbs to be shifted
+        let limb_shift = (rhs / 64) as usize;
+        // bits to be shifted
+        let bit_shift = rhs % 64;
+
+        // limb shift
+        for i in 0..4 {
+            if i + limb_shift < 4 {
+                num[i] = limbs[i + limb_shift];
+            }
+        }
+
+        // bit shift
+        if bit_shift > 0 {
+            for i in 0..4 {
+                // shift bits in the present limb
+                num[i] >>= bit_shift;
+
+                // handle carry over bits from the previous limb
+                if i < 3 {
+                    num[i] |= limbs[i + 1] << (64 - bit_shift);
                 }
             }
         }
