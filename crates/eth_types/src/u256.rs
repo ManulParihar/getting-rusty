@@ -1,7 +1,5 @@
 use std::{
-    fmt::{Debug, Display},
-    ops::{Add, AddAssign, BitAnd, BitOr, BitXor, Not, Shl, Shr, Sub},
-    cmp::{Ordering}
+    cmp::Ordering, fmt::{Debug, Display}, ops::{Add, AddAssign, BitAnd, BitOr, BitXor, Not, Shl, Shr, Sub, SubAssign}
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -146,6 +144,40 @@ impl Ord for U256 {
 impl PartialOrd for U256 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl Sub for U256 {
+    type Output = U256;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        if rhs == self {
+            return U256::ZERO;
+        }
+        if rhs.is_zero() {
+            return self;
+        }
+
+        let mut num = [0u64; 4];
+        let lhs = self.0;
+        let rhs = rhs.0;
+        let (sub, mut borrow) = lhs[0].overflowing_sub(rhs[0]);
+        num[0] = sub;
+
+        for i in 1..4 {
+            let (res1, borrow1) = lhs[i].overflowing_sub(rhs[i]);
+            let (res2, borrow2) = res1.overflowing_sub(borrow as u64);
+            num[i] = res2;
+            borrow = borrow1 || borrow2;
+        }
+
+        Self(num)
+    }
+}
+
+impl SubAssign for U256 {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = *self - rhs;
     }
 }
 

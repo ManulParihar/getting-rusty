@@ -711,4 +711,87 @@ mod tests {
             true
         );
     }
+
+    #[test]
+    fn basic_sub() {
+        let a = U256::from(5);
+        let b = U256::from(3);
+        assert_eq!(
+            a - b,
+            U256::from(2)
+        );
+    }
+
+    #[test]
+    fn zero_sub() {
+        let a = U256::from(5);
+        assert_eq!(
+            a - U256::ZERO,
+            a
+        );
+    }
+
+    #[test]
+    fn self_sub() {
+        let a = U256::from(5);
+        assert_eq!(
+            a - a,
+            U256::ZERO
+        );
+    }
+
+    #[test]
+    fn single_borrow_sub() {
+        let a = U256::from_limbs([0, 1, 0, 0]);
+        let b = U256::from_limbs([1, 0, 0, 0]);
+        assert_eq!(
+            a - b,
+            U256::from(u64::MAX)
+        );
+    }
+
+    #[test]
+    fn chain_borrow_sub() {
+        let a = U256::from_limbs([0, 0, 0, 1]);
+        let b = U256::from_limbs([1, 0, 0, 0]);
+        assert_eq!(
+            a - b,
+            U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, 0])
+        );
+    }
+
+    #[test]
+    fn underflow_sub() {
+        let a = U256::from(1);
+        assert_eq!(
+            U256::ZERO - a,
+            U256::MAX
+        );
+    }
+
+    #[test]
+    fn test_sub_random() {
+        let a = U256::from_limbs([
+            0x1234567890abcdef,
+            0xfedcba0987654321,
+            0x1111111111111111,
+            0x2222222222222222,
+        ]);
+
+        let b = U256::from_limbs([
+            0x1111111111111111,
+            0x2222222222222222,
+            0x0101010101010101,
+            0x1111111111111111,
+        ]);
+
+        let expected = U256::from_limbs([
+            0x012345677f9abcde,
+            0xdcba97e7654320ff,
+            0x1010101010101010,
+            0x1111111111111111,
+        ]);
+
+        assert_eq!(a - b, expected);
+    }
 }
