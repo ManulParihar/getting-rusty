@@ -1,6 +1,7 @@
 use std::{
     fmt::{Debug, Display},
-    ops::{Add, AddAssign, BitAnd, BitOr, BitXor, Not, Shl, Shr}
+    ops::{Add, AddAssign, BitAnd, BitOr, BitXor, Not, Shl, Shr, Sub},
+    cmp::{Ordering}
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -121,6 +122,30 @@ impl Add for U256 {
 impl AddAssign for U256 {
     fn add_assign(&mut self, rhs: Self) {
         *self = *self + rhs;
+    }
+}
+
+impl Ord for U256 {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let lhs = self.0;
+        let rhs = other.0;
+
+        for i in (0..4).rev() {
+            if lhs[i] > rhs[i] {
+                return Ordering::Greater;
+            }
+            if lhs[i] < rhs[i] {
+                return Ordering::Less;
+            }
+        }
+
+        Ordering::Equal
+    }
+}
+
+impl PartialOrd for U256 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

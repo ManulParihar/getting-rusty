@@ -622,4 +622,93 @@ mod tests {
             U256::ZERO
         );
     }
+
+    #[test]
+    fn basic_cmp() {
+        assert_eq!(
+            U256::ZERO < U256::MAX,
+            true
+        );
+        assert_eq!(
+            U256::ZERO > U256::MAX,
+            false
+        );
+        assert_eq!(
+            U256::ZERO == U256::MAX,
+            false
+        );
+        assert_eq!(
+            U256::ZERO != U256::MAX,
+            true
+        );
+    }
+
+    #[test]
+    fn equal_cmp() {
+        let a = U256::from_limbs([1, 2, 3, 4]);
+        assert_eq!(
+            a == a,
+            true
+        );
+    }
+
+    #[test]
+    fn not_equal_cmp() {
+        let a = U256::from_limbs([1, 2, 3, 4]);
+        assert_eq!(
+            a != U256::from(1),
+            true
+        );
+    }
+
+    #[test]
+    fn max_cmp() {
+        assert_eq!(
+            U256::MAX == U256::MAX,
+            true
+        );
+    }
+
+    #[test]
+    fn basic_partial_cmp() {
+        let a = U256::from(1);
+        let b = U256::from(2);
+
+        assert_eq!(
+            a <= b,
+            true
+        );
+        assert_eq!(
+            a >= b,
+            false
+        );
+        assert_eq!(
+            a == b,
+            false
+        );
+        assert_eq!(
+            a != b,
+            true
+        );
+    }
+
+    #[test]
+    fn zero_max_partial_cmp() {
+        assert_eq!(
+            U256::ZERO <= U256::MAX,
+            true
+        );
+        assert_eq!(
+            U256::ZERO >= U256::MAX,
+            false
+        );
+        assert_eq!(
+            U256::ZERO == U256::MAX,
+            false
+        );
+        assert_eq!(
+            U256::ZERO != U256::MAX,
+            true
+        );
+    }
 }
