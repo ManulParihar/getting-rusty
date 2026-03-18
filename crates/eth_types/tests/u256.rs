@@ -8,10 +8,23 @@ mod tests {
     }
 
     #[test]
+    fn max_constant() {
+        assert_eq!(U256::MAX, U256::from_limbs([u64::MAX; 4]));
+    }
+
+    #[test]
     fn zero_const_matches_zero_fn() {
         assert_eq!(
             U256::ZERO,
             U256::zero()
+        );
+    }
+
+    #[test]
+    fn max_const_matches_max_fn() {
+        assert_eq!(
+            U256::MAX,
+            U256::max()
         );
     }
 
@@ -61,6 +74,15 @@ mod tests {
 
         assert_eq!(zero.is_zero(), true);
         assert_eq!(non_zero.is_zero(), false);
+    }
+
+    #[test]
+    fn is_max() {
+        let max = U256::max();
+        let non_max = U256::from(42u64);
+
+        assert_eq!(max.is_max(), true);
+        assert_eq!(non_max.is_max(), false);
     }
 
     #[test]
@@ -196,6 +218,28 @@ mod tests {
     }
 
     #[test]
+    fn limb_and_bit_shift_shl() {
+        let a = U256::from(1);
+        let res = a << 129;
+        let expected = U256::from_limbs([0, 0, 0x0000000000000002, 0]);
+        assert_eq!(
+            res,
+            expected
+        );
+    }
+
+    #[test]
+    fn cross_limb_shl() {
+        let a = U256::from(1);
+        let res = a << 65;
+        let expected = U256::from_limbs([0, 0x0000000000000002, 0, 0]);
+        assert_eq!(
+            res,
+            expected
+        );
+    }
+
+    #[test]
     fn basic_shr() {
         // ...0001 >> 1 === ...0000
         let num = U256::from(1u64);
@@ -265,6 +309,17 @@ mod tests {
         assert_eq!(
             num >> 256,
             U256::ZERO
+        );
+    }
+
+    #[test]
+    fn carry_shr() {
+        let a = U256::from_limbs([0, 0, 0, 1]);
+        let res = a >> 1;
+        let expected = U256::from_limbs([0, 0, 0x8000000000000000, 0]);
+        assert_eq!(
+            res,
+            expected
         );
     }
 
@@ -487,5 +542,84 @@ mod tests {
             0x8000000000000001,
         ]);
         assert_eq!(a ^ b, expected);
+    }
+
+    #[test]
+    fn zero_not() {
+        assert_eq!(
+            !U256::ZERO,
+            U256::MAX
+        );
+    }
+
+    #[test]
+    fn max_not() {
+        assert_eq!(
+            !U256::MAX,
+            U256::ZERO
+        );
+    }
+
+    #[test]
+    fn double_not() {
+        let a = U256::from_limbs([123, 456, 789, 999]);
+        assert_eq!(
+            !(!a),
+            a
+        );
+    }
+
+    #[test]
+    fn random_not() {
+        let a = U256::from_limbs([
+            0x1234567890abcdef,
+            0xfedcba0987654321,
+            0x0f0f0f0f0f0f0f0f,
+            0xf0f0f0f0f0f0f0f0,
+        ]);
+
+        let expected = U256::from_limbs([
+            0xedcba9876f543210,
+            0x012345f6789abcde,
+            0xf0f0f0f0f0f0f0f0,
+            0x0f0f0f0f0f0f0f0f,
+        ]);
+        assert_eq!(!a, expected);
+    }
+
+    #[test]
+    fn edge_not() {
+        let a = U256::from_limbs([
+            0x8000000000000000, // only MSB set
+            0,
+            0,
+            0,
+        ]);
+
+        let expected = U256::from_limbs([
+            0x7FFFFFFFFFFFFFFF,
+            u64::MAX,
+            u64::MAX,
+            u64::MAX,
+        ]);
+        assert_eq!(!a, expected);
+    }
+
+    #[test]
+    fn or_not() {
+        let a = U256::from_limbs([1, 2, 3, 4]);
+        assert_eq!(
+            a | !a,
+            U256::MAX
+        );
+    }
+
+    #[test]
+    fn and_not() {
+        let a = U256::from_limbs([1, 2, 3, 4]);
+        assert_eq!(
+            a & !a,
+            U256::ZERO
+        );
     }
 }

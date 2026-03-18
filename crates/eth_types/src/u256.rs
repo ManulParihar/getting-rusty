@@ -1,6 +1,6 @@
 use std::{
     fmt::{Debug, Display},
-    ops::{Add, AddAssign, BitAnd, BitOr, BitXor, Shl, Shr}
+    ops::{Add, AddAssign, BitAnd, BitOr, BitXor, Not, Shl, Shr}
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -41,6 +41,10 @@ impl U256 {
 
     pub fn is_zero(&self) -> bool {
         self.0 == [0u64; 4]
+    }
+
+    pub fn is_max(&self) -> bool {
+        self.0 == [u64::MAX; 4]
     }
 }
 
@@ -137,26 +141,19 @@ impl Shl<u32> for U256 {
 
         let mut num = [0u64; 4];
 
-        // limb shift
-        for i in 0..4 {
-            if i + limb_shift < 4 {
-                num[i + limb_shift] = limbs[i];
-            }
-        }
+        for i in (0..4).rev() {
+            if i >= limb_shift {
+                // bit shift on the limb that needs to be shifted, and then perform limb shift
+                num[i] |= limbs[i - limb_shift] << bit_shift;
 
-        // bit shift
-        if bit_shift > 0 {
-            for i in (0..4).rev() {
-                // do shl on current limb
-                num[i] <<= bit_shift;
-
-                // transfer carry over bits from the previous limb
-                if i > 0 {
-                    // during `num[i] <<= bit_shift`, the left most bits were updated to 0
+                // transfer carry over bits from the lower limb
+                if bit_shift > 0 && i > limb_shift {
+                    // during `num[i] |= limbs[i - limb_shift] << bit_shift`, 
+                    // the left most bits were updated to 0.
                     // `|=` overwrites the left most bits with the carry over from previous bits
                     // since shl will discard carry over bits, it can be calculated
                     // by reverse shifting (i.e. shifting right) by (64-bit_shift) units
-                    num[i] |= limbs[i - 1] >> (64 - bit_shift);
+                    num[i] |= limbs[i - limb_shift - 1] >> (64 - bit_shift);
                 }
             }
         }
@@ -183,22 +180,13 @@ impl Shr<u32> for U256 {
         // bits to be shifted
         let bit_shift = rhs % 64;
 
-        // limb shift
         for i in 0..4 {
             if i + limb_shift < 4 {
-                num[i] = limbs[i + limb_shift];
-            }
-        }
+                num[i] |= limbs[i + limb_shift] >> bit_shift;
 
-        // bit shift
-        if bit_shift > 0 {
-            for i in 0..4 {
-                // shift bits in the present limb
-                num[i] >>= bit_shift;
-
-                // handle carry over bits from the previous limb
-                if i < 3 {
-                    num[i] |= limbs[i + 1] << (64 - bit_shift);
+                // handle carry over bits from the higher limb
+                if bit_shift > 0 && i + limb_shift < 3 {
+                    num[i] |= limbs[i + limb_shift + 1] << (64 - bit_shift);
                 }
             }
         }
@@ -277,6 +265,28 @@ impl BitXor for U256 {
 
         for i in 0..4 {
             num[i] = lhs[i] ^ rhs[i];
+        }
+
+        Self(num)
+    }
+}
+
+impl Not for U256 {
+    type Output = U256;
+
+    fn not(self) -> Self::Output {
+        if self.is_zero() {
+            return U256::MAX;
+        }
+        if self.is_max() {
+            return U256::ZERO;
+        }
+
+        let mut num = [0u64; 4];
+        let lhs = self.0;
+
+        for i in 0..4 {
+            num[i] = !lhs[i];
         }
 
         Self(num)
