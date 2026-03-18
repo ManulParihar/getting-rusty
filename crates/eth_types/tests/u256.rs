@@ -644,6 +644,16 @@ mod tests {
     }
 
     #[test]
+    fn cross_limbs_cmp() {
+        let a = U256::from(u64::MAX);
+        let b = U256::from_limbs([0, 1, 0, 0]);
+        assert_eq!(
+            a < b,
+            true
+        );
+    }
+
+    #[test]
     fn equal_cmp() {
         let a = U256::from_limbs([1, 2, 3, 4]);
         assert_eq!(
@@ -761,11 +771,30 @@ mod tests {
     }
 
     #[test]
+    fn reverse_borrow() {
+        let a = U256::from(1);
+        let b = U256::from_limbs([0, 1, 0, 0]);
+        assert_eq!(
+            a - b,
+            U256::from_limbs([1, u64::MAX, u64::MAX, u64::MAX])
+        );
+    }
+
+    #[test]
     fn underflow_sub() {
         let a = U256::from(1);
         assert_eq!(
             U256::ZERO - a,
             U256::MAX
+        );
+    }
+
+    #[test]
+    fn full_wrap_sub() {
+        let a = U256::from_limbs([0, 0, 0, 1]);
+        assert_eq!(
+            U256::ZERO - a,
+            U256::from_limbs([0, 0, 0, u64::MAX])
         );
     }
 

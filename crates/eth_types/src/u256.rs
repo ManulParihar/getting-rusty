@@ -151,13 +151,6 @@ impl Sub for U256 {
     type Output = U256;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        if rhs == self {
-            return U256::ZERO;
-        }
-        if rhs.is_zero() {
-            return self;
-        }
-
         let mut num = [0u64; 4];
         let lhs = self.0;
         let rhs = rhs.0;
