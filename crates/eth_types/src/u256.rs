@@ -19,7 +19,8 @@ pub struct U256([u64; 4]);
  * ============================================================
  */
 impl U256 {
-    pub const ZERO:Self = Self([0u64; 4]);
+    pub const ZERO: Self = Self([0u64; 4]);
+    pub const MAX: Self = Self([u64::MAX; 4]);
 
     pub fn zero() -> Self {
         Self::ZERO

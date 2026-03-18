@@ -105,8 +105,7 @@ mod tests {
 
     #[test]
     fn overflow_wrapping() {
-        let sum = U256::from_limbs([u64::MAX, u64::MAX, u64::MAX, u64::MAX]) + 
-                        U256::from_limbs([1, 0, 0, 0]);
+        let sum = U256::MAX + U256::from_limbs([1, 0, 0, 0]);
 
         assert_eq!(
             sum,
@@ -290,9 +289,8 @@ mod tests {
     #[test]
     fn all_ones_and() {
         let num = U256::from_limbs([1, 2, 3, 4]);
-        let rhs = U256::from_limbs([u64::MAX; 4]);
         assert_eq!(
-            num & rhs,
+            num & U256::MAX,
             num
         );
     }
@@ -369,10 +367,9 @@ mod tests {
 
     #[test]
     fn all_ones_or() {
-        let n1 = U256::from_limbs([u64::MAX; 4]);
         assert_eq!(
-            n1 | U256::ZERO,
-            n1
+            U256::MAX | U256::ZERO,
+            U256::MAX
         );
     }
 
@@ -391,7 +388,7 @@ mod tests {
         let n2 = U256::from_limbs([0x5555555555555555; 4]);
         assert_eq!(
             n1 | n2,
-            U256::from_limbs([u64::MAX; 4])
+            U256::MAX
         );
     }
 
@@ -450,7 +447,7 @@ mod tests {
 
     #[test]
     fn with_zero_xor() {
-        let all_ones = U256::from_limbs([u64::MAX; 4]);
+        let all_ones = U256::MAX;
         assert_eq!(
             all_ones ^ U256::ZERO,
             all_ones
@@ -463,7 +460,7 @@ mod tests {
         let n2 = U256::from_limbs([0x5555555555555555; 4]);
         assert_eq!(
             n1 ^ n2,
-            U256::from_limbs([u64::MAX; 4])
+            U256::MAX
         );
     }
 
