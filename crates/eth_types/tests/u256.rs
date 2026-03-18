@@ -389,7 +389,6 @@ mod tests {
     fn disjoin_bits_or() {
         let n1 = U256::from_limbs([0xAAAAAAAAAAAAAAAA; 4]);
         let n2 = U256::from_limbs([0x5555555555555555; 4]);
-
         assert_eq!(
             n1 | n2,
             U256::from_limbs([u64::MAX; 4])
@@ -418,7 +417,78 @@ mod tests {
             0x8000000000000001,
             0xFFFFFFFFFFFFFFFF,
         ]);
-
         assert_eq!(a | b, expected);
+    }
+
+    #[test]
+    fn basic_xor() {
+        let a = U256::from(1);
+        let b = U256::from(1);
+        assert_eq!(
+            a ^ b,
+            U256::ZERO
+        );
+    }
+
+    #[test]
+    fn self_xor() {
+        let a = U256::from_limbs([123, 456, 789, 999]);
+        assert_eq!(
+            a ^ a,
+            U256::ZERO
+        );
+    }
+
+    #[test]
+    fn zero_identity_xor() {
+        let a = U256::from_limbs([123, 456, 789, 999]);
+        assert_eq!(
+            a ^ U256::ZERO,
+            a
+        );
+    }
+
+    #[test]
+    fn with_zero_xor() {
+        let all_ones = U256::from_limbs([u64::MAX; 4]);
+        assert_eq!(
+            all_ones ^ U256::ZERO,
+            all_ones
+        );
+    }
+
+    #[test]
+    fn complement_xor() {
+        let n1 = U256::from_limbs([0xAAAAAAAAAAAAAAAA; 4]);
+        let n2 = U256::from_limbs([0x5555555555555555; 4]);
+        assert_eq!(
+            n1 ^ n2,
+            U256::from_limbs([u64::MAX; 4])
+        );
+    }
+
+    #[test]
+    fn random_xor() {
+        let a = U256::from_limbs([
+            0x8000000000000001,
+            0x8000000000000001,
+            0x8000000000000001,
+            0x8000000000000001,
+        ]);
+
+        let b = U256::from_limbs([
+            0xFFFFFFFFFFFFFFFF,
+            0,
+            0xFFFFFFFFFFFFFFFF,
+            0,
+        ]);
+
+        let expected = U256::from_limbs([
+            0x7FFFFFFFFFFFFFFE,
+            0x8000000000000001,
+            0x7FFFFFFFFFFFFFFE,
+            0x8000000000000001,
+        ]);
+        assert_eq!(a ^ b, expected);
     }
 }
