@@ -199,10 +199,6 @@ impl BitAnd for U256 {
     type Output = U256;
 
     fn bitand(self, rhs: Self) -> Self::Output {
-        if self.is_zero() || rhs.is_zero() {
-            return U256::ZERO;
-        }
-
         let mut num = [0u64; 4];
         let lhs = self.0;
         let rhs = rhs.0;
@@ -219,18 +215,6 @@ impl BitOr for U256 {
     type Output = U256;
 
     fn bitor(self, rhs: Self) -> Self::Output {
-        if self.is_zero() && rhs.is_zero() {
-            return U256::ZERO;
-        }
-
-        if self.is_zero() {
-            return rhs;
-        }
-
-        if rhs.is_zero() {
-            return self;
-        }
-
         let mut num = [0u64; 4];
         let lhs = self.0;
         let rhs = rhs.0;
@@ -247,18 +231,6 @@ impl BitXor for U256 {
     type Output = U256;
 
     fn bitxor(self, rhs: Self) -> Self::Output {
-        if self.is_zero() && rhs.is_zero() {
-            return U256::ZERO;
-        }
-
-        if self.is_zero() {
-            return rhs;
-        }
-
-        if rhs.is_zero() {
-            return self;
-        }
-
         let mut num = [0u64; 4];
         let lhs = self.0;
         let rhs = rhs.0;
@@ -275,13 +247,6 @@ impl Not for U256 {
     type Output = U256;
 
     fn not(self) -> Self::Output {
-        if self.is_zero() {
-            return U256::MAX;
-        }
-        if self.is_max() {
-            return U256::ZERO;
-        }
-
         let mut num = [0u64; 4];
         let lhs = self.0;
 
