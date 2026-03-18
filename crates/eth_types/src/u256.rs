@@ -26,6 +26,10 @@ impl U256 {
         Self::ZERO
     }
 
+    pub fn max() -> Self {
+        Self::MAX
+    }
+
     pub fn as_limbs(&self) -> &[u64; 4] {
         &self.0
     }
