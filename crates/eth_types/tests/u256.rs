@@ -264,8 +264,161 @@ mod tests {
         // U256([0, 0, 0, 1]) >> 256 === U256([0, 0, 0, 0])
         let num = U256::from_limbs([0, 0, 0, 1]);
         assert_eq!(
-            num << 256,
+            num >> 256,
             U256::ZERO
         );
+    }
+
+    #[test]
+    fn basic_and() {
+        let lhs = U256::from(1);
+        let rhs = U256::from(1);
+        assert_eq!(
+            lhs & rhs,
+            U256::from(1)
+        );
+    }
+
+    #[test]
+    fn zero_and() {
+        assert_eq!(
+            U256::ZERO & U256::from_limbs([123, 456, 789, 999]),
+            U256::ZERO
+        );
+    }
+
+    #[test]
+    fn all_ones_and() {
+        let num = U256::from_limbs([1, 2, 3, 4]);
+        let rhs = U256::from_limbs([u64::MAX; 4]);
+        assert_eq!(
+            num & rhs,
+            num
+        );
+    }
+
+    #[test]
+    fn complement_and() {
+        let n1 = U256::from_limbs([u64::MAX, 0, 0, 0]);
+        let n2 = U256::from_limbs([0, u64::MAX, 0, 0]);
+        assert_eq!(
+            n1 & n2,
+            U256::ZERO
+        );
+    }
+
+    #[test]
+    fn partial_overlap_and() {
+        let a = U256::from_limbs([
+            0xF0F0F0F0F0F0F0F0,
+            0x0F0F0F0F0F0F0F0F,
+            0xFFFF0000FFFF0000,
+            0x0000FFFF0000FFFF,
+        ]);
+
+        let b = U256::from_limbs([
+            0xFF00FF00FF00FF00,
+            0x00FF00FF00FF00FF,
+            0xFFFF00000000FFFF,
+            0x00000000FFFFFFFF,
+        ]);
+
+        let expected = U256::from_limbs([
+            0xF000F000F000F000,
+            0x000F000F000F000F,
+            0xFFFF000000000000,
+            0x000000000000FFFF,
+        ]);
+
+        assert_eq!(
+            a & b,
+            expected
+        );
+    }
+
+    #[test]
+    fn basic_or() {
+        let n1 = U256::from(1);
+        let n2 = U256::from(2);
+        assert_eq!(
+            n1 | n2,
+            U256::from(3)
+        );
+    }
+
+    #[test]
+    fn zero_or() {
+        let num = U256::from(1);
+        assert_eq!(
+            num | U256::ZERO,
+            num
+        );
+        assert_eq!(
+            U256::ZERO | num,
+            num
+        );
+    }
+
+    #[test]
+    fn both_zero_or() {
+        assert_eq!(
+            U256::ZERO | U256::ZERO,
+            U256::ZERO
+        );
+    }
+
+    #[test]
+    fn all_ones_or() {
+        let n1 = U256::from_limbs([u64::MAX; 4]);
+        assert_eq!(
+            n1 | U256::ZERO,
+            n1
+        );
+    }
+
+    #[test]
+    fn identity_or() {
+        let n1 = U256::from_limbs([123, 456, 789, 999]);
+        assert_eq!(
+            n1 | U256::ZERO,
+            n1
+        );
+    }
+
+    #[test]
+    fn disjoin_bits_or() {
+        let n1 = U256::from_limbs([0xAAAAAAAAAAAAAAAA; 4]);
+        let n2 = U256::from_limbs([0x5555555555555555; 4]);
+
+        assert_eq!(
+            n1 | n2,
+            U256::from_limbs([u64::MAX; 4])
+        );
+    }
+
+    #[test]
+    fn random_or() {
+        let a = U256::from_limbs([
+            0x8000000000000001,
+            0x8000000000000001,
+            0x8000000000000001,
+            0x8000000000000001,
+        ]);
+
+        let b = U256::from_limbs([
+            0x0,
+            0xFFFFFFFFFFFFFFFF,
+            0x0,
+            0xFFFFFFFFFFFFFFFF,
+        ]);
+
+        let expected = U256::from_limbs([
+            0x8000000000000001,
+            0xFFFFFFFFFFFFFFFF,
+            0x8000000000000001,
+            0xFFFFFFFFFFFFFFFF,
+        ]);
+
+        assert_eq!(a | b, expected);
     }
 }

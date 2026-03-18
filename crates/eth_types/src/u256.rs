@@ -1,6 +1,6 @@
 use std::{
     fmt::{Debug, Display},
-    ops::{Add, AddAssign, Shl, Shr}
+    ops::{Add, AddAssign, BitAnd, BitOr, Shl, Shr}
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -199,5 +199,53 @@ impl Shr<u32> for U256 {
         }
 
         U256(num)
+    }
+}
+
+impl BitAnd for U256 {
+    type Output = U256;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        if self.is_zero() || rhs.is_zero() {
+            return U256::ZERO;
+        }
+
+        let mut num = [0u64; 4];
+        let lhs = self.0;
+        let rhs = rhs.0;
+
+        for i in 0..4 {
+            num[i] = lhs[i] & rhs[i];
+        }
+
+        Self(num)
+    }
+}
+
+impl BitOr for U256 {
+    type Output = U256;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        if self.is_zero() && rhs.is_zero() {
+            return U256::ZERO;
+        }
+
+        if self.is_zero() {
+            return rhs;
+        }
+
+        if rhs.is_zero() {
+            return self;
+        }
+
+        let mut num = [0u64; 4];
+        let lhs = self.0;
+        let rhs = rhs.0;
+
+        for i in 0..4 {
+            num[i] = lhs[i] |  rhs[i];
+        }
+
+        Self(num)
     }
 }
