@@ -62,61 +62,13 @@ impl Node {
 
         current_row.pop().unwrap()
     }
-
-    // pub fn create(leaf_nodes: Vec<[u8; 32]>) -> Self {
-    //     let leaf_count = leaf_nodes.len();
-    //     let mut list = leaf_nodes;
-    //     // In case of odd no. of leaves, last node is duplicated
-    //     if leaf_count % 2 != 0 {
-    //         list.push(list[leaf_count-1]);
-    //     }
-
-    //     let mut current_row: Vec<Node> = Vec::new();
-    //     let mut parent_row: Vec<Node> = Vec::new();
-    //     let mut len;
-
-    //     for i in 0..leaf_count {
-    //         current_row.push(
-    //             Node::Leaf(list[i])
-    //         );
-    //     }
-    //     len = current_row.len();
-
-    //     while len > 1 {
-    //         for i in 0..(len/2) {
-    //             let hash1 = match &current_row[2*i] {
-    //                 Node::Leaf(hash) => hash,
-    //                 Node::Branch { left: _, right: _, hash } => hash
-    //             };
-    //             let hash2 = match &current_row[(2*i)+1] {
-    //                 Node::Leaf(hash) => hash,
-    //                 Node::Branch { left: _, right: _, hash } => hash
-    //             };
-    //             let parent_hash = Self::hash_nodes(hash1, hash2);
-                
-    //             let parent_node = Node::Branch {
-    //                 left: Box::new(current_row[2*i]),
-    //                 right: Box::new(current_row[(2*i)+1]),
-    //                 hash: parent_hash
-    //             };
-
-    //             parent_row.push(parent_node);
-    //         }
-
-    //         let mut count = parent_row.len();
-
-    //         if (len % 2) != 0 {
-    //             parent_row.push(parent_row[count-1]);
-    //             count += 1;
-    //         }
-            
-    //         len = count;
-    //         current_row = parent_row;
-    //         parent_row = Vec::new();
-    //     }
-
-    //     current_row[0]
-    // }
+    
+    pub fn root(&self) -> [u8; 32] {
+        match self {
+            Node::Leaf(h) => *h,
+            Node::Branch { hash, .. } => *hash,
+        }
+    }
 
     pub fn hash_nodes(hash1: &[u8; 32], hash2: &[u8; 32]) -> [u8; 32] {
         let mut hasher = Sha256::new();
