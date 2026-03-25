@@ -86,4 +86,18 @@ impl Merkle {
 
         proofs
     }
+
+    pub fn verify_proof(leaf: H256, proof: Vec<MerkleProof>, root: H256) -> bool {
+        let mut current_hash = leaf;
+
+        for p in proof {
+            current_hash = if p.is_left {
+                Self::calculate_parent_hash(&p.hash, &current_hash)
+            } else {
+                Self::calculate_parent_hash(&current_hash, &p.hash)
+            };
+        }
+
+        current_hash == root
+    }
 }
