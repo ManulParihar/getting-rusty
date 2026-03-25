@@ -109,6 +109,29 @@ mod tests {
     }
 
     #[test]
+    // valid leaf + incorrect proof + correct root => false
+    fn invalid_proof_flip_direction() {
+        let merkle_tree = create_merkle(true);
+        
+        let leaf_str = format!("merkle_proof_{}", 5);
+        let leaf = hash_str(&leaf_str);
+
+        let mut proofs = merkle_tree.get_proof(5);
+        // tampering with the proof
+        let proof = proofs.pop().unwrap();
+        // Flip the direction of proof
+        proofs.push(
+            MerkleProof::new(proof.hash(), !proof.is_left())
+        );
+
+        let root = merkle_tree.root();
+
+        let is_proof_correct = Merkle::verify_proof(leaf, proofs, root);
+
+        assert!(!is_proof_correct);
+    }
+
+    #[test]
     // proof should be empty, verify_proof should still work
     fn single_leaf_merkle_tree() {
         let single_leaf = H256::from([1u8; 32]);
