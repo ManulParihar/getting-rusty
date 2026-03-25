@@ -42,6 +42,13 @@ impl Merkle {
         Self { levels }
     }
 
+    pub fn root(&self) -> H256 {
+        *self.levels
+            .last()
+            .and_then(|level| level.first())
+            .expect("Merkle tree should have at least one node")
+    }
+
     pub fn calculate_parent_hash(hash1: &H256, hash2: &H256) -> H256 {
         let mut hasher = Sha256::new();
         hasher.update(hash1.as_bytes());
@@ -102,5 +109,19 @@ impl Merkle {
         }
 
         current_hash == root
+    }
+}
+
+impl MerkleProof {
+    pub fn new(hash: H256, is_left: bool) -> Self {
+        Self { hash, is_left }
+    }
+
+    pub fn hash(&self) -> H256 {
+        self.hash
+    }
+
+    pub fn is_left(&self) -> bool {
+        self.is_left
     }
 }

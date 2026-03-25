@@ -2,4 +2,4 @@ pub mod node;
 pub mod merkle;
 
 pub use node::Node;
-pub use merkle::Merkle;
+pub use merkle::{ Merkle, MerkleProof };
