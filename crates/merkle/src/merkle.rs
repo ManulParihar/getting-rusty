@@ -87,6 +87,9 @@ impl Merkle {
         proofs
     }
 
+    // Verifies that a leaf is part of merkle tree against a given set of proof and the root
+    // NOTE: If the leaf, proof and root are all malicious, the function still returns true
+    // In that case, it is upon the user to verify the input root against the correct one.
     pub fn verify_proof(leaf: H256, proof: Vec<MerkleProof>, root: H256) -> bool {
         let mut current_hash = leaf;
 
